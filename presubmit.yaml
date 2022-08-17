@@ -1,0 +1,50 @@
+steps:
+- id: 'branch-name'
+  name: 'alpine'
+  waitFor: ['-']
+  entrypoint: 'sh'
+  args:
+    - '-c'
+    - |
+      echo  echo "*****************************TEST DAGS**************************************************************************"
+      echo "HEAD BRANCH_NAME: $_HEAD_BRANCH -- BASE BRANCH_NAME:$_BASE_BRANCH -- SHORT_SHA - ${SHORT_SHA} PROJECT_ID: $PROJECT_ID"
+      echo "***********************************************************************************************************************"
+
+- id: 'setup-repos'
+  name: 'hashicorp/terraform:1.2.4'
+  waitFor: ['-']
+  dir: './infra'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    sed -i s/PROJECT_ID/$PROJECT_ID/g backend.tf
+    sed -i s/PROJECT_ID/$PROJECT_ID/g terraform.tfvars
+    sed -i s/PROJECT_ID/$PROJECT_ID/g provider.tf
+    sed -i s/LOCATION_ID/${_COMPOSER_LOCATION}/g backend.tf
+    sed -i s/LOCATION_ID/${_COMPOSER_LOCATION}/g terraform.tfvars
+    sed -i s/LOCATION_ID/${_COMPOSER_LOCATION}/g provider.tf
+    terraform init
+    terraform workspace select $PROJECT_ID || terraform workspace new $PROJECT_ID
+    terraform apply --auto-approve
+
+- id: 'build-test-container'
+  name: 'gcr.io/kaniko-project/executor:latest'
+  waitFor: ['setup-repos']
+  args:
+    - --destination=${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/aftest
+    - --cache=true
+    - --cache-ttl=240h
+
+- id: 'run-unit-test'
+  name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/aftest:latest'
+  waitFor: ['build-test-container']
+  entrypoint: 'sh'
+  args:
+    - '-c'
+    - |
+      pytest /workspace/tests
+options:
+    dynamic_substitutions: true
+substitutions:
+  _COMPOSER_LOCATION: europe-west2

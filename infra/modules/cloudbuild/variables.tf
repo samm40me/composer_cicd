@@ -1,0 +1,2 @@
+variable "triggers" {}
+variable "region" {}
