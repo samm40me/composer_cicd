@@ -13,7 +13,7 @@ steps:
 - id: 'make-env-substitutions'
   name: 'ubuntu'
   waitFor: ['-']
-  args: ['bash', './env_subst.sh','apply', '/workspace/infra_build', '$PROJECT_ID', '${_COMPOSER_LOCATION}', '$PROJECT_ID']
+  args: ['bash', './env_subst.sh','apply', '/workspace/infra_build', '$PROJECT_ID', '${_COMPOSER_LOCATION}', '$_COMPOSER_ENV']
 
 - id: 'setup-repos'
   name: 'hashicorp/terraform:1.2.4'
@@ -23,21 +23,9 @@ steps:
   args:
   - '-c'
   - |
-    terraform init
-    terraform workspace select $PROJECT_ID || terraform workspace new $PROJECT_ID
+    terraform init || exit 1
+    terraform workspace select ${PROJECT_ID} || terraform workspace new ${PROJECT_ID}
     terraform apply --auto-approve
-
-- id: 'copy-dags-to-data-bucket-for-testing'
-  name: gcr.io/cloud-builders/gcloud
-  waitFor: ['setup-repos']
-  entrypoint: 'sh'
-  args:
-  - '-c'
-  - |
-    dag_bucket=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3|sed 's/\/dags//g')
-    echo "BUCKET=${dag_bucket}"  
-    gsutil rsync -r -d dags/ ${dag_bucket}/data/${SHORT_SHA}/
-    gcloud composer environments run ${_COMPOSER_ENV} --location ${_COMPOSER_LOCATION} dags list -- --subdir /home/airflow/gcs/data/${SHORT_SHA}/
 
 - id: 'build-test-container'
   name: 'gcr.io/kaniko-project/executor:latest'
@@ -55,9 +43,21 @@ steps:
     - '-c'
     - |
       pytest /workspace/tests
+
+- id: 'run-int-tests'
+  name: gcr.io/cloud-builders/gcloud
+  waitFor: ['setup-repos']
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    dag_bucket=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3|sed 's/\/dags//g')
+    echo "BUCKET=${dag_bucket}"  
+    gsutil rsync -r -d dags/ ${dag_bucket}/data/${SHORT_SHA}/
+    gcloud composer environments run ${_COMPOSER_ENV} --location ${_COMPOSER_LOCATION} dags list -- --subdir /home/airflow/gcs/data/${SHORT_SHA}/
+    gsutil rm -rf ${dag_bucket}/data/${SHORT_SHA}/
 options:
     dynamic_substitutions: true
 substitutions:
   _COMPOSER_LOCATION: europe-west2
   _COMPOSER_ENV: ${PROJECT_ID}
-  _COMPOSER_BUCKET:
