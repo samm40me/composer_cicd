@@ -34,7 +34,7 @@ steps:
   args:
   - '-c'
   - |
-    bucket=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3|sed 's/\/dags//g'')
+    bucket=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3|sed 's/\/dags//g')
     echo "BUCKET=$bucket"  
     gsutil --version
 
