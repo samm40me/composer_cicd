@@ -46,7 +46,7 @@ steps:
 
 - id: 'run-int-tests'
   name: gcr.io/cloud-builders/gcloud
-  waitFor: ['setup-repos']
+  waitFor: ['run-unit-test']
   entrypoint: 'sh'
   args:
   - '-c'
