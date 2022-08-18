@@ -34,9 +34,9 @@ steps:
   args:
   - '-c'
   - |
-    bucket=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3|sed 's/\/dags//g')
+    dag_bucket=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3|sed 's/\/dags//g')
     echo "BUCKET=$bucket"  
-    gsutil --version
+    gsutil rsync -r -d dags/ ${dag_buckets}/data/${SHORT_SHA}/
 
 - id: 'build-test-container'
   name: 'gcr.io/kaniko-project/executor:latest'
