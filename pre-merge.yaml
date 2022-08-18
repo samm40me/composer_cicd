@@ -10,9 +10,14 @@ steps:
       echo "HEAD BRANCH_NAME: $_HEAD_BRANCH -- BASE BRANCH_NAME:$_BASE_BRANCH -- SHORT_SHA - ${SHORT_SHA} PROJECT_ID: $PROJECT_ID"
       echo "***********************************************************************************************************************"
 
+- id: 'make-env-substitutions'
+  name: 'ubuntu'
+  waitFor: ['-']
+  args: ['bash', './env_subst.sh','apply', 'infra_build', '$PROJECT_ID', '${_COMPOSER_LOCATION}', '$PROJECT_ID']
+
 - id: 'setup-repos'
   name: 'hashicorp/terraform:1.2.4'
-  waitFor: ['-']
+  waitFor: ['make-env-substitutions']
   dir: './infra_build'
   entrypoint: 'sh'
   args:

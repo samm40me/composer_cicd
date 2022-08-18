@@ -46,7 +46,7 @@ shell:
 
 triggers: ## Build CICD triggers against your GitHub Repo
 	$(suppress_output)echo ${DAG_BUCKET}
-	$(call run, bash /workspace/tf_utils.sh apply infra ${PROJECT} ${LOCATION} ${COMPOSER_ENV})
+	$(call run, bash ./tf_utils.sh apply infra ${PROJECT} ${LOCATION} ${COMPOSER_ENV})
 
 test: ## test
 	@echo ${CURDIR}
