@@ -15,9 +15,8 @@ steps:
   waitFor: ['-']
   entrypoint: 'sh'
   args:
-  - '-c'
   - |
-    tf_utils.sh apply infra_build ${PROJECT_ID} ${_COMPOSER_LOCATION} ${PROJECT_ID}
+    ./tf_utils.sh apply infra_build ${PROJECT_ID} ${_COMPOSER_LOCATION} ${PROJECT_ID}
 
 - id: 'build-test-container'
   name: 'gcr.io/kaniko-project/executor:latest'
