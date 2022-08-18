@@ -37,6 +37,7 @@ steps:
     dag_bucket=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3|sed 's/\/dags//g')
     echo "BUCKET=${dag_bucket}"  
     gsutil rsync -r -d dags/ ${dag_bucket}/data/${SHORT_SHA}/
+    gcloud composer environments run ${_COMPOSER_ENV} --location ${_COMPOSER_LOCATION} dags list -- --subdir /home/airflow/gcs/data/${SHORT_SHA}/
 
 - id: 'build-test-container'
   name: 'gcr.io/kaniko-project/executor:latest'
@@ -58,4 +59,5 @@ options:
     dynamic_substitutions: true
 substitutions:
   _COMPOSER_LOCATION: europe-west2
+  _COMPOSER_ENV: ${PROJECT_ID}
   _COMPOSER_BUCKET:

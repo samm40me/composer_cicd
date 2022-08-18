@@ -2,7 +2,7 @@ References -->
 https://github.com/GoogleCloudPlatform/python-docs-samples/tree/main/composer/cicd_sample
 https://cloud.google.com/composer/docs/dag-cicd-integration-guide
 https://cloud.google.com/composer/docs/how-to/using/testing-dags
-https://cloud.google.com/composer/docs/how-to/using/testing-dags
+https://cloud.google.com/architecture/cicd-pipeline-for-data-processing
 
 
 AF1
