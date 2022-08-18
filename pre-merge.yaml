@@ -28,6 +28,17 @@ steps:
     terraform workspace select $PROJECT_ID || terraform workspace new $PROJECT_ID
     terraform apply --auto-approve
 
+- id: 'copy-dags-to-data-bucket-for-testing'
+  name: gcr.io/cloud-builders/gcloud
+  waitFor: ['setup-repos']
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    DAG_BUCKET=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
+    echo "BUCKET=$DAG_BUCKET"  
+    gsutil --version
+
 - id: 'build-test-container'
   name: 'gcr.io/kaniko-project/executor:latest'
   waitFor: ['setup-repos']
