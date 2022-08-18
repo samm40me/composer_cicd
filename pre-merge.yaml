@@ -13,8 +13,9 @@ steps:
 - id: 'setup-repos'
   name: 'hashicorp/terraform:1.2.4'
   waitFor: ['-']
-  entrypoint: ' '
+  entrypoint: 'pwd'
   args:
+    - '&&'
     - | 
       sh /workspace/tf_utils.sh apply infra_build ${PROJECT_ID} ${_COMPOSER_LOCATION} ${PROJECT_ID}
 
