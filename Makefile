@@ -45,8 +45,7 @@ shell:
 	$(call run, /bin/bash)
 
 triggers: ## Build CICD triggers against your GitHub Repo
-	$(suppress_output)echo ${DAG_BUCKET}
-	$(call run, bash ./tf_utils.sh apply infra ${PROJECT} ${LOCATION} ${COMPOSER_ENV})
+	$(call run, bash /workspace_stg/tf_utils.sh apply infra ${PROJECT} ${LOCATION} ${COMPOSER_ENV})
 
 test: ## test
 	@echo ${CURDIR}
@@ -56,7 +55,7 @@ define run
 	$(continue_on_error)docker run \
 		--rm \
 		${run_options} \
-		-v $(PWD):/workspace:ro \
+		-v $(PWD):/workspace_stg:ro \
 		-v $(SA_KEY):/credentials/access.json:ro \
 		--env GOOGLE_APPLICATION_CREDENTIALS=/credentials/access.json \
 		${GCLOUD_MOUNT} \
