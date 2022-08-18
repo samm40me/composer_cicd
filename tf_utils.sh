@@ -13,19 +13,31 @@ set_tf_vars(){
   done
 }
 
-
 # Start of Bash Script
 command=$1
 folder=$2
 project_id=$3
 location_id=$4
 composer_env=$5
+
 cp -R /workspace /tmp
 set_tf_vars
+
 cd ${WORKDIR}/${folder}
+
 terraform init
 terraform workspace select ${project_id} || terraform workspace new ${project_id}
-terraform "${command}"
+
+if [ $command == "apply" ]
+then
+ terraform apply --auto-approve
+elif [ $command == "destroy" ]
+then
+  terraform destroy --auto-approve
+elif [ $command == "plan" ]
+then
+  terraform plan
+fi
 
 
 
