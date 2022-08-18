@@ -8,20 +8,18 @@ output "trigger" {
   ]
 }
 
-resource "google_cloudbuild_trigger" "include-build-logs-trigger" {
-  for_each = {for trigger in local.cloudbuild_config.triggers :trigger.name=> trigger}
-
-  name     = each.value.name
-  filename = each.value.github.source_repo
+resource "google_cloudbuild_trigger" "composer-pre-merge-trigger" {
+  name     = "composer-pre-merge-trigger"
+  description = "composer-pre-merge-trigger"
+  filename = "./pre-merge.yaml"
   project = "kev-pinto-sandbox"
 
   github {
     owner = "kev-pinto-cts"
-    name  = each.value.name
+    name  = "composer_cicd"
     push {
-      branch = each.value.github.branch
+      branch = "main"
     }
   }
-
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 }

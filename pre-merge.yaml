@@ -13,11 +13,10 @@ steps:
 - id: 'setup-repos'
   name: 'hashicorp/terraform:1.2.4'
   waitFor: ['-']
-  entrypoint: 'sh'
+  entrypoint: ' '
   args:
-    - '-c'
     - | 
-      "/workspace/tf_utils.sh apply infra_build ${PROJECT_ID} ${_COMPOSER_LOCATION} ${PROJECT_ID}"
+      sh /workspace/tf_utils.sh apply infra_build ${PROJECT_ID} ${_COMPOSER_LOCATION} ${PROJECT_ID}
 
 
 - id: 'build-test-container'
