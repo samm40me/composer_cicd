@@ -14,7 +14,7 @@ source ${WORKDIR}/env_subst.sh $command ${WORKDIR}/infra $project_id $location_i
 
 cd ${WORKDIR}/infra
 
-terraform init
+terraform init || exit 1
 terraform workspace select ${project_id} || terraform workspace new ${project_id}
 
 if [ $command == "apply" ]
