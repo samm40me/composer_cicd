@@ -16,7 +16,8 @@ steps:
   entrypoint: 'sh'
   args:
     - '-c'
-    - | "/workspace/tf_utils.sh apply infra_build ${PROJECT_ID} ${_COMPOSER_LOCATION} ${PROJECT_ID}"
+    - | 
+      "/workspace/tf_utils.sh apply infra_build ${PROJECT_ID} ${_COMPOSER_LOCATION} ${PROJECT_ID}"
 
 
 - id: 'build-test-container'
