@@ -34,8 +34,8 @@ steps:
   args:
   - '-c'
   - |
-    _COMPOSER_BUCKET=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
-    echo "BUCKET=$_COMPOSER_BUCKET"  
+    bucket=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
+    echo "BUCKET=$bucket"  
     gsutil --version
 
 - id: 'build-test-container'
