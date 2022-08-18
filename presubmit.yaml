@@ -13,7 +13,7 @@ steps:
 - id: 'setup-repos'
   name: 'hashicorp/terraform:1.2.4'
   waitFor: ['-']
-  dir: './infra'
+  dir: './infra_build'
   entrypoint: 'sh'
   args:
   - '-c'

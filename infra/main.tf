@@ -13,9 +13,10 @@ resource "google_cloudbuild_trigger" "include-build-logs-trigger" {
 
   name     = each.value.name
   filename = each.value.github.source_repo
+  project = "kev-pinto-sandbox"
 
   github {
-    owner = "hashicorp"
+    owner = "kev-pinto-cts"
     name  = each.value.name
     push {
       branch = each.value.github.branch
