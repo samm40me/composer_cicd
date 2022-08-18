@@ -13,10 +13,8 @@ steps:
 - id: 'setup-repos'
   name: 'hashicorp/terraform:1.2.4'
   waitFor: ['-']
-  entrypoint: 'ls'
-  args:
-  - |
-   -l
+  entrypoint: 'ls -l'
+
 
 - id: 'build-test-container'
   name: 'gcr.io/kaniko-project/executor:latest'
