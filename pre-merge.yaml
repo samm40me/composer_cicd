@@ -35,8 +35,8 @@ steps:
   args:
   - '-c'
   - |
-    DAG_BUCKET=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
-    echo "BUCKET=$DAG_BUCKET"  
+    _COMPOSER_BUCKET=$(gcloud composer environments describe $PROJECT_ID --location ${_COMPOSER_LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
+    echo "BUCKET=$_COMPOSER_BUCKET"  
     gsutil --version
 
 - id: 'build-test-container'
@@ -59,3 +59,4 @@ options:
     dynamic_substitutions: true
 substitutions:
   _COMPOSER_LOCATION: europe-west2
+  _COMPOSER_BUCKET:
