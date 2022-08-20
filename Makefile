@@ -47,7 +47,7 @@ shell:
 	$(call run, /bin/bash)
 
 triggers: ## Build CICD triggers against your GitHub Repo
-	$(call run, bash /workspace_stg/tf_utils.sh plan infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
+	$(call run, bash /workspace_stg/tf_utils.sh apply infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
 
 del-triggers: ## Destroy your Build Triggers
 	$(call run, bash /workspace_stg/tf_utils.sh destroy infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
