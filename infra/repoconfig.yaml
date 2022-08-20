@@ -1,5 +1,5 @@
 triggers:
-- name: composer-cicd-pre-merge-test
+- name: composer-cicd-pre-merge
   description: trigger to verify dag integity on a PR
   tags: demo
   disabled: false
@@ -9,10 +9,10 @@ triggers:
     owner: kev-pinto-cts
     name: composer_cicd
     pull_request:
-      branch: test
+      branch: ^(main|test|uat|preprod)$
       comment_control: COMMENTS_DISABLED
       invert_regex: false
-- name: composer-cicd-on-merge-test
+- name: composer-cicd-on-merge
   description: Trigger to Deploy Dags
   tags: demo
   disabled: false
@@ -22,6 +22,6 @@ triggers:
     owner: kev-pinto-cts
     name: composer_cicd
     push:
-      branch: test
+      branch: ^(main|test|uat|preprod)$
       invert_regex: false
 
