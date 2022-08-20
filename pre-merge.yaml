@@ -56,8 +56,6 @@ steps:
     gsutil rsync -r -d dags/ ${dag_bucket}/data/${SHORT_SHA}/
     gcloud composer environments run ${_COMPOSER_ENV} --location ${_COMPOSER_LOCATION} dags list -- --subdir /home/airflow/gcs/data/${SHORT_SHA}/
     gsutil rm -rf ${dag_bucket}/data/${SHORT_SHA}/
-    jq --version
-
 options:
     dynamic_substitutions: true
 substitutions:

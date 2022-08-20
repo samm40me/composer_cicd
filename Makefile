@@ -1,11 +1,12 @@
-PROJECT ?= kev-pinto-sandbox
+DEPLOYMNENT_PROJECT=kev-pinto-deploy
 LOCATION=europe-west2
+PROJECT ?= kev-pinto-sandbox
 COMPOSER_ENV ?= ${PROJECT}
 SERVICE_ACCOUNT=terraform@kev-pinto-sandbox.iam.gserviceaccount.com
-SA_KEY=/Users/pintok/.config/gcloud/terraform-kev-pinto-sandbox.json
+SA_KEY=/Users/pintok/.config/gcloud/kev-pinto-deploy-b1bf3f5a3949.json
 DAG_BUCKET ?= $$(gcloud composer environments describe ${COMPOSER_ENV} --location ${LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
 PROJECT_NUMBER ?= $$(gcloud projects list --filter=${PROJECT} --format="value(PROJECT_NUMBER)")
-TFSTATE_BUCKET ?= ${PROJECT}-composercicd-tfstate
+TFSTATE_BUCKET ?= ${DEPLOYMNENT_PROJECT}-composercicd-tfstate
 BUILD_CONTAINER ?= cicd
 BUILD_CONTAINER_TAG ?= latest
 GCLOUD_DIR ?= $$(gcloud info --format='value(config.paths.global_config_dir)')
@@ -31,10 +32,11 @@ init: ## This will build the Airflow testing Container -- Run this once only
 	$(suppress_output)docker build -t ${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} .
 
 bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
-	$(suppress_output)gcloud config set project ${PROJECT}
-	$(call run, gsutil mb -c standard -l ${LOCATION} -p ${PROJECT} gs://${TFSTATE_BUCKET})
+	$(suppress_output)gcloud config set project ${DEPLOYMNENT_PROJECT}
+	$(call run, gsutil mb -c standard -l ${LOCATION} -p ${DEPLOYMNENT_PROJECT} gs://${TFSTATE_BUCKET})
 
-deploy: tests ## Deploy Dags to Your Project -- This Runs your Unit tests first
+deploy: tests ## Deploy Dags to Your Dev Project -- This Runs your Unit tests first
+	$(suppress_output)gcloud config set project ${PROJECT}
 	$(suppress_output)echo ${DAG_BUCKET}
 	$(call run,gsutil -m rsync -r dags/  ${DAG_BUCKET})
 
@@ -45,7 +47,11 @@ shell:
 	$(call run, /bin/bash)
 
 triggers: ## Build CICD triggers against your GitHub Repo
-	$(call run, bash /workspace_stg/tf_utils.sh apply infra ${PROJECT} ${LOCATION} ${COMPOSER_ENV})
+	$(call run, bash /workspace_stg/tf_utils.sh plan infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
+
+del-triggers: ## Destroy your Build Triggers
+	$(call run, bash /workspace_stg/tf_utils.sh destroy infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
+
 
 test: ## test
 	@echo ${CURDIR}

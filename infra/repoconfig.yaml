@@ -1,17 +1,27 @@
 triggers:
-- name: composer-cicd-demo-trigger-presubmit
+- name: composer-cicd-pre-merge-test
   description: trigger to verify dag integity on a PR
+  tags: demo
+  disabled: false
+  filename: pre-merge.yaml
+  include_build_logs: INCLUDE_BUILD_LOGS_WITH_STATUS
   github:
-    owner: KP
-    source_repo: composer_cicd
-    event: PR
-    branch: test
-    filename: presubmit.yaml
-- name: composer-cicd-demo-trigger-on-push
-  description: trigger to verify dag integity on a PR
+    owner: kev-pinto-cts
+    name: composer_cicd
+    pull_request:
+      branch: test
+      comment_control: COMMENTS_DISABLED
+      invert_regex: false
+- name: composer-cicd-on-merge-test
+  description: Trigger to Deploy Dags
+  tags: demo
+  disabled: false
+  filename: pre-merge.yaml
+  approval_required: true
   github:
-    owner: KP
-    source_repo: composer_cicd
-    event: PR
-    branch: test
-    filename: presubmit.yaml
+    owner: kev-pinto-cts
+    name: composer_cicd
+    push:
+      branch: test
+      invert_regex: false
+

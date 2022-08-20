@@ -1,6 +1,0 @@
-{
-  "main": "prod-project",
-  "test": "test-project",
-  "uat": "uat-project",
-  "preprod": "pre-prod-project"
-}
