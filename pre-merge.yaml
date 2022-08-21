@@ -25,18 +25,18 @@ steps:
   - |
     terraform init || exit 1
     terraform workspace select ${PROJECT_ID} || terraform workspace new ${PROJECT_ID}
-    terraform plan
+    terraform apply --auto-approve
 
 - id: 'build-test-container'
   name: 'gcr.io/kaniko-project/executor:latest'
   waitFor: ['setup-repos']
   args:
-    - --destination=${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/aftest
+    - --destination=${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd
     - --cache=true
     - --cache-ttl=240h
 
 - id: 'run-unit-test'
-  name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/aftest:latest'
+  name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd:latest'
   waitFor: ['build-test-container']
   entrypoint: 'sh'
   args:
