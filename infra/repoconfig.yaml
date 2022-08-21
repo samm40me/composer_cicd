@@ -17,7 +17,6 @@ triggers:
   tags: demo
   disabled: false
   filename: pre-merge.yaml
-  approval_required: true
   github:
     owner: kev-pinto-cts
     name: composer_cicd
