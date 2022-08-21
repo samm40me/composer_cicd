@@ -1,5 +1,5 @@
 resource "google_artifact_registry_repository" "aftest" {
-  provider = google
+  provider = google-beta
   project = var.project
   location = var.location
   repository_id = "airflow-test-container"

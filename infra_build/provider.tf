@@ -7,6 +7,11 @@ terraform {
   }
 }
 
+provider "google-beta" {
+  project     = "PROJECT_ID"
+  region      = LOCATION_ID"
+}
+
 provider "google" {
   project     = "PROJECT_ID"
   region      = "LOCATION_ID"
