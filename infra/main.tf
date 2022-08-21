@@ -13,7 +13,7 @@ locals {
     github              = try(trigger.github, null)
     github_pull_request = try(trigger.github.pull_request, null)
     github_push         = try(trigger.github.push, null)
-    approval_required     = try(trigger.approval_required, null)
+    approval_required     = try(trigger.approval_required, false)
   }
   ]
 }
