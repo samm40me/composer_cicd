@@ -12,7 +12,6 @@ BUILD_CONTAINER_TAG ?= latest
 GCLOUD_DIR ?= $$(gcloud info --format='value(config.paths.global_config_dir)')
 GCLOUD_MOUNT ?= -v $(GCLOUD_DIR):/root/.config/gcloud
 
-
 # Makefile command prefixes
 continue_on_error = -
 suppress_output = @
@@ -33,7 +32,11 @@ init: ## This will build the Airflow testing Container -- Run this once only
 
 bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
 	$(suppress_output)gcloud config set project ${DEPLOYMNENT_PROJECT}
+	$(call run, gcloud services enable artifactregistry.googleapis.com)
+	$(call run, gcloud services enable cloudresourcemanager.googleapis.com)
+	$(call run, gcloud services enable cloudbuild.googleapis.com)
 	$(call run, gsutil mb -c standard -l ${LOCATION} -p ${DEPLOYMNENT_PROJECT} gs://${TFSTATE_BUCKET})
+
 
 deploy: tests ## Deploy Dags to Your Dev Project -- This Runs your Unit tests first
 	$(suppress_output)gcloud config set project ${PROJECT}
@@ -52,9 +55,6 @@ triggers: ## Build CICD triggers against your GitHub Repo
 del-triggers: ## Destroy your Build Triggers
 	$(call run, bash /workspace_stg/tf_utils.sh destroy infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
 
-
-test: ## test
-	@echo ${CURDIR}
 
 # Mount Users gcloud creds on the Container
 define run
