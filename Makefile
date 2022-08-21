@@ -11,6 +11,7 @@ BUILD_CONTAINER ?= cicd
 BUILD_CONTAINER_TAG ?= latest
 GCLOUD_DIR ?= $$(gcloud info --format='value(config.paths.global_config_dir)')
 GCLOUD_MOUNT ?= -v $(GCLOUD_DIR):/root/.config/gcloud
+ARTIFACT_REGISTRY_NAME=airflow-test-container
 
 # Makefile command prefixes
 continue_on_error = -
@@ -32,9 +33,17 @@ init: ## This will build the Airflow testing Container -- Run this once only
 
 bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
 	$(suppress_output)gcloud config set project ${DEPLOYMNENT_PROJECT}
+	$(suppress_output)echo "Enabling Artifact Registry API...."
 	$(call run, gcloud services enable artifactregistry.googleapis.com)
+	$(suppress_output)echo "Enabling Cloud Resource Manager API...."
 	$(call run, gcloud services enable cloudresourcemanager.googleapis.com)
+	$(suppress_output)echo "Enabling Cloud Build API...."
 	$(call run, gcloud services enable cloudbuild.googleapis.com)
+	$(suppress_output)echo "Building Artifact Repo to Store Docker Image of Airflow Test Container...."
+	$(call run, gcloud artifacts repositories create ${ARTIFACT_REGISTRY_NAME} --repository-format=docker \
+    --location=${LOCATION} \
+    --async)
+	(suppress_output)echo "Creating Terraform State Bucket ${TFSTATE_BUCKET}...."
 	$(call run, gsutil mb -c standard -l ${LOCATION} -p ${DEPLOYMNENT_PROJECT} gs://${TFSTATE_BUCKET})
 
 

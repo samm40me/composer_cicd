@@ -10,26 +10,9 @@ steps:
       echo "HEAD BRANCH_NAME: $_HEAD_BRANCH -- BASE BRANCH_NAME:$_BASE_BRANCH -- SHORT_SHA - ${SHORT_SHA} PROJECT_ID: $PROJECT_ID"
       echo "***********************************************************************************************************************"
 
-- id: 'make-env-substitutions'
-  name: 'ubuntu'
-  waitFor: ['-']
-  args: ['bash', './env_subst.sh','apply', '/workspace/infra_build', '$PROJECT_ID', '${_COMPOSER_LOCATION}', '$_COMPOSER_ENV']
-
-- id: 'setup-repos'
-  name: 'hashicorp/terraform:1.2.4'
-  waitFor: ['make-env-substitutions']
-  dir: './infra_build'
-  entrypoint: 'sh'
-  args:
-  - '-c'
-  - |
-    terraform init || exit 1
-    terraform workspace select ${PROJECT_ID} || terraform workspace new ${PROJECT_ID}
-    terraform apply --auto-approve
-
 - id: 'build-test-container'
   name: 'gcr.io/kaniko-project/executor:latest'
-  waitFor: ['setup-repos']
+  waitFor: ['-']
   args:
     - --destination=${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd
     - --cache=true
