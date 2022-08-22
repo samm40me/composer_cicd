@@ -9,7 +9,7 @@ steps:
       echo  echo "*****************************TEST DAGS**************************************************************************"
       echo "HEAD BRANCH_NAME: $_HEAD_BRANCH -- BASE BRANCH_NAME:$_BASE_BRANCH -- SHORT_SHA - ${SHORT_SHA} PROJECT_ID: $PROJECT_ID"
       echo "***********************************************************************************************************************"
-      echo "$BRANCH:$BRANCH_NAME"
+      echo "BRANCH:$BRANCH_NAME"
       jq --version
 
 - id: 'build-test-container'
