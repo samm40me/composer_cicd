@@ -13,6 +13,11 @@ steps:
       jq --version
 
 - id: 'build-test-container'
+  name: 'ubuntu'
+  waitFor: ['-']
+  args: ['jq', '--version']
+
+- id: 'build-test-container'
   name: 'gcr.io/kaniko-project/executor:latest'
   waitFor: ['-']
   args:
