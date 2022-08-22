@@ -1,1 +1,1 @@
-( main:project-prod test:project-test uat:project-uat preprod:project-preprod)
+(main:project-prod test:project-test uat:project-uat preprod:project-preprod)
