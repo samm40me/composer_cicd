@@ -12,7 +12,7 @@ steps:
       echo "BRANCH:$BRANCH_NAME"
       jq --version
 
-- id: 'build-test-container'
+- id: 'jq'
   name: 'ubuntu'
   waitFor: ['-']
   args: ['jq', '--version']
