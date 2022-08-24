@@ -28,13 +28,12 @@ steps:
       pytest /workspace/tests
 
 - id: 'run-int-tests'
-  name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd:latest'
-  waitFor: ['run-unit-test']
-  entrypoint: 'sh'
+  name: 'gcr.io/cloud-builders/gcloud'
+  waitFor: ['-']
   args:
-  - '-c'
+  - 'bash'
   - |
-    jq --version
+    /run_integration_tests.sh $BRANCH_NAME $COMMIT_SHA
 options:
     dynamic_substitutions: true
 substitutions:

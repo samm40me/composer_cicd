@@ -12,6 +12,7 @@ BUILD_CONTAINER_TAG ?= latest
 GCLOUD_DIR ?= $$(gcloud info --format='value(config.paths.global_config_dir)')
 GCLOUD_MOUNT ?= -v $(GCLOUD_DIR):/root/.config/gcloud
 ARTIFACT_REGISTRY_NAME=airflow-test-container
+project_to_branch_map=$$(cat env_mapper.txt)
 
 # Makefile command prefixes
 continue_on_error = -
@@ -63,6 +64,16 @@ triggers: ## Build CICD triggers against your GitHub Repo
 
 del-triggers: ## Destroy your Build Triggers
 	$(call run, bash /workspace_stg/tf_utils.sh destroy infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
+
+set-iam:
+	for file in ${project_to_branch_map};do \
+  		proj=$$(echo $$file|cut -d ":" -f1) ; \
+  		echo $${proj} ; \
+  		$(suppress_output)gcloud config set project $${proj}; \
+  		gcloud config list ; \
+  		db=$$(gcloud composer environments describe $${proj} --location ${LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3); \
+  		echo $${db}; \
+  	done
 
 
 # Mount Users gcloud creds on the Container

@@ -1,1 +1,2 @@
-(main:project-prod test:project-test uat:project-uat preprod:project-preprod)
+kev-pinto-prod:europe-west2-kev-pinto-prod-139d8019-bucket:main
+kev-pinto-test:europe-west2-kev-pinto-test-c630625b-bucket:test
