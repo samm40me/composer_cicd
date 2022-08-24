@@ -26,15 +26,6 @@ steps:
     - '-c'
     - |
       pytest /workspace/tests
-
-- id: 'run-int-tests'
-  name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd:latest'
-  waitFor: ['-']
-  entrypoint: 'sh'
-  args:
-  - '-c''
-  - |
-    echo $BRANCH_NAME $COMMIT_SHA
 options:
     dynamic_substitutions: true
 substitutions:
