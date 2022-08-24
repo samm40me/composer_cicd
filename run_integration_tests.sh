@@ -14,6 +14,6 @@ for mapping in ${project_to_branch_map[@]}; do
 
   if [ ${BRANCH} == ${branch} ]; then
     echo "Deploying to ${project_id}"
-    gsutil cp -r -d dags gs://{dag_bucket}/data/${SHORT_SHA}/
+    gsutil rsync -r -d dags/ gs://{dag_bucket}/data/${SHORT_SHA}/
   fi
 done
