@@ -5,7 +5,6 @@ COMMIT_SHA=$2
 
 echo "BRANCH=${BRANCH} COMMIT_SHA=${COMMIT_SHA}"
 
-
 project_to_branch_map=($(cat env_mapper.txt))
 for mapping in ${project_to_branch_map[@]}; do
   project_id=$(echo ${mapping}|cut -d":" -f1)
@@ -15,5 +14,6 @@ for mapping in ${project_to_branch_map[@]}; do
 
   if [ ${BRANCH} == ${branch} ]; then
     echo "Deploying to ${project_id}"
+
   fi
 done
