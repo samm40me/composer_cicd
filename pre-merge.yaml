@@ -35,8 +35,6 @@ steps:
   - '-c''
   - |
     echo $BRANCH_NAME $COMMIT_SHA
-    project_to_branch_map=($(cat env_mapper.txt))
-    echo ${project_to_branch_map}
 options:
     dynamic_substitutions: true
 substitutions:
