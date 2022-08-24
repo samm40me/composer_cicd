@@ -32,8 +32,9 @@ steps:
   waitFor: ['build-test-container']
   entrypoint: 'bash'
   args:
-    - |  
-      run_integration_tests.sh $BRANCH_NAME $SHORT_SHA
+    - run_integration_tests.sh
+    - $BRANCH_NAME
+    - $SHORT_SHA
 options:
     dynamic_substitutions: true
 substitutions:
