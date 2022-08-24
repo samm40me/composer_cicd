@@ -37,6 +37,9 @@ steps:
       echo ${BRANCH_NAME} ${COMMIT_SHA}
       project_to_branch_map="($(cat env_mapper.txt))"
       echo "${project_to_branch_map}"
+      for mapping in "${project_to_branch_map[@]}"; do
+        echo "${mapping}"
+      done
 options:
     dynamic_substitutions: true
 substitutions:
