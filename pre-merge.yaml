@@ -30,10 +30,13 @@ steps:
 - id: 'run-int-tests'
   name: 'gcr.io/cloud-builders/gcloud'
   waitFor: ['-']
+  entrypoint: 'sh'
   args:
-  - 'bash'
+  - '-c''
   - |
-    /run_integration_tests.sh $BRANCH_NAME $COMMIT_SHA
+    echo $BRANCH_NAME $COMMIT_SHA
+    project_to_branch_map=($(cat env_mapper.txt))
+    echo ${project_to_branch_map}
 options:
     dynamic_substitutions: true
 substitutions:
