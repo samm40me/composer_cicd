@@ -28,7 +28,7 @@ steps:
       pytest /workspace/tests
 
 - id: 'run-int-tests'
-  name: 'gcr.io/cloud-builders/gcloud'
+  name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd:latest'
   waitFor: ['-']
   entrypoint: 'sh'
   args:
