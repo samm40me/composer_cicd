@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-BRANCH=$1
-COMMIT_SHA=$2
+#BRANCH=$1
+#COMMIT_SHA=$2
 
 echo "BRANCH=${BRANCH} COMMIT_SHA=${COMMIT_SHA}"
 

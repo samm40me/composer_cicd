@@ -30,16 +30,9 @@ steps:
 - id: 'run-int-test'
   name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd:latest'
   waitFor: ['build-test-container']
-  entrypoint: 'sh'
+  entrypoint: 'bash'
   args:
-    - '-c'
-    - |
-      echo ${BRANCH_NAME} ${COMMIT_SHA}
-      project_to_branch_map="($(cat env_mapper.txt))"
-      echo "${project_to_branch_map}"
-      for mapping in "${project_to_branch_map[@]}"; do
-        echo "${mapping}"
-      done
+    - 'run_integration_tests.sh'
 options:
     dynamic_substitutions: true
 substitutions:
