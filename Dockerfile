@@ -9,4 +9,5 @@ RUN echo "alias python=python3" >> ~/.bashrc
 
 COPY requirements.txt /tmp
 RUN  pip install -r /tmp/requirements.txt
+RUN  gcloud components install kubectl
 
