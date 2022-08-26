@@ -4,7 +4,7 @@ BRANCH=$1
 SHORT_SHA=$2
 LOCATION=$3
 
-echo "BRANCH=${BRANCH} COMMIT_SHA=${COMMIT_SHA}"
+echo "BRANCH=${BRANCH} COMMIT_SHA=${SHORT_SHA}"
 
 project_to_branch_map=($(cat env_mapper.txt))
 for mapping in ${project_to_branch_map[@]}; do
@@ -14,8 +14,9 @@ for mapping in ${project_to_branch_map[@]}; do
 #  echo "Project_id=${project_id}, Branch=${branch}"
 
   if [ ${BRANCH} == ${branch} ]; then
-    echo "Deploying to ${project_id}"
     gcloud config set project ${project_id}
+    my_dag_bucket=$(gcloud composer environments describe ${COMPOSER_ENV} --location ${LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
+    echo "Deploying to ${project_id} - ${my_dag_bucket}"
     gsutil rsync -r -d dags/ gs://${dag_bucket}/data/${SHORT_SHA}/
     gcloud composer environments run ${project_id} --location ${LOCATION} dags list -- --subdir /home/airflow/gcs/data/${SHORT_SHA}/
     gsutil rm -rf gs://${dag_bucket}/data/${SHORT_SHA}/
