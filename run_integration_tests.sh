@@ -15,7 +15,7 @@ for mapping in ${project_to_branch_map[@]}; do
 
   if [ ${BRANCH} == ${branch} ]; then
     gcloud config set project ${project_id}
-    my_dag_bucket=$(gcloud composer environments describe ${project_id} --location ${LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
+    my_dag_bucket=$(gcloud composer environments describe "${project_id}" --location "${LOCATION}"|grep dagGcsPrefix|cut -d ":" -f2-3)
     echo "Deploying to ${project_id} - ${my_dag_bucket}"
     gsutil rsync -r -d dags/ gs://${dag_bucket}/data/${SHORT_SHA}/
     gcloud composer environments run ${project_id} --location ${LOCATION} dags list -- --subdir /home/airflow/gcs/data/${SHORT_SHA}/

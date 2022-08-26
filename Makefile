@@ -1,8 +1,7 @@
 DEPLOYMNENT_PROJECT=kev-pinto-deploy
 LOCATION=europe-west2
-PROJECT ?= kev-pinto-sandbox
-COMPOSER_ENV ?= ${PROJECT}
-SERVICE_ACCOUNT=terraform@kev-pinto-sandbox.iam.gserviceaccount.com
+DEV_PROJECT ?= kev-pinto-sandbox
+COMPOSER_ENV ?= ${DEV_PROJECT}
 SA_KEY=/Users/pintok/.config/gcloud/kev-pinto-deploy-b1bf3f5a3949.json
 DAG_BUCKET ?= $$(gcloud composer environments describe ${COMPOSER_ENV} --location ${LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
 PROJECT_NUMBER ?= $$(gcloud projects list --filter=${PROJECT} --format="value(PROJECT_NUMBER)")
