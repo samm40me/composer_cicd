@@ -12,6 +12,7 @@ GCLOUD_DIR ?= $$(gcloud info --format='value(config.paths.global_config_dir)')
 GCLOUD_MOUNT ?= -v $(GCLOUD_DIR):/root/.config/gcloud
 ARTIFACT_REGISTRY_NAME=airflow-test-container
 project_to_branch_map=$$(cat env_mapper.txt)
+WORKDIR?=/workspace_stg
 
 # Makefile command prefixes
 continue_on_error = -
@@ -78,11 +79,11 @@ define run
 	$(continue_on_error)docker run \
 		--rm \
 		${run_options} \
-		-v $(PWD):/workspace_stg:ro \
+		-v $(PWD):${WORKDIR}:ro \
 		-v $(SA_KEY):/credentials/access.json:ro \
 		--env GOOGLE_APPLICATION_CREDENTIALS=/credentials/access.json \
 		${GCLOUD_MOUNT} \
+		-w ${WORKDIR} \
 		${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} \
-		--workdir="/workspace_stg" \
 		${1}
 endef
