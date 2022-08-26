@@ -7,9 +7,10 @@ import pytest
 import sys
 from airflow import models
 from airflow.utils.dag_cycle_tester import check_cycle
+
 sys.path.append(f"{Path(__file__).parents[1]}/dags")
 
-DAG_PATHS = glob.glob(path.join(path.dirname(__file__),"..", "dags", "*.py"), recursive=True)
+DAG_PATHS = glob.glob(path.join(path.dirname(__file__), "..", "dags", "*.py"), recursive=True)
 
 
 def _import_file(module_name, module_path):
