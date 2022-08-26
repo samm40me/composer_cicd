@@ -83,5 +83,6 @@ define run
 		--env GOOGLE_APPLICATION_CREDENTIALS=/credentials/access.json \
 		${GCLOUD_MOUNT} \
 		${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} \
+		--workdir="/workspace_stg" \
 		${1}
 endef
