@@ -40,15 +40,13 @@ bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! 
 	$(suppress_output)echo "Enabling Cloud Build API...."
 	$(call run, gcloud services enable cloudbuild.googleapis.com)
 	$(suppress_output)echo "Building Artifact Repo to Store Docker Image of Airflow Test Container...."
-	$(call run, gcloud artifacts repositories create ${ARTIFACT_REGISTRY_NAME} --repository-format=docker \
-    --location=${LOCATION} \
-    --async)
+	$(call run, gcloud artifacts repositories create ${ARTIFACT_REGISTRY_NAME} --repository-format=docker --location=${LOCATION} --async)
 	(suppress_output)echo "Creating Terraform State Bucket ${TFSTATE_BUCKET}...."
 	$(call run, gsutil mb -c standard -l ${LOCATION} -p ${DEPLOYMNENT_PROJECT} gs://${TFSTATE_BUCKET})
 
 
 deploy: tests ## Deploy Dags to Your Dev Project -- This Runs your Unit tests first
-	$(suppress_output)gcloud config set project ${PROJECT}
+	$(suppress_output)gcloud config set project ${DEV_PROJECT}
 	$(suppress_output)echo ${DAG_BUCKET}
 	$(call run,gsutil -m rsync -r dags/  ${DAG_BUCKET})
 
