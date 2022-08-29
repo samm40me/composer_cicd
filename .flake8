@@ -1,0 +1,17 @@
+[flake8]
+ignore = E241, E712, W504
+exclude =
+    setup.py,
+    # No need to traverse our git directory
+    .git,
+    # There's no value in checking cache directories
+    __pycache__,
+#max-complexity = 10
+per-file-ignores =
+    # E202, E203 is whitespace before/after (), which is sometimes
+    # broken when aligning data in test scripts.
+    # E501 is line too long
+    # E303 is too many blank lines
+    # F403 and F405 relate to importing using *. It is usually useful to
+    # do so in test scripts.
+    tests/*: E202, E203, E501, F403, F405
