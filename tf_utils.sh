@@ -27,11 +27,3 @@ elif [ $command == "plan" ]
 then
   terraform plan
 fi
-
-
-
-
-
-
-
-

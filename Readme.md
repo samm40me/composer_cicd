@@ -1,5 +1,5 @@
-Added Pre Commit 
-References --> 
+Added Pre Commit
+References -->
 https://github.com/GoogleCloudPlatform/python-docs-samples/tree/main/composer/cicd_sample
 https://cloud.google.com/composer/docs/dag-cicd-integration-guide
 https://cloud.google.com/composer/docs/how-to/using/testing-dags
@@ -18,4 +18,3 @@ AF2
 gcloud composer environments run \
 test-environment --location us-central1 \
 dags list -- --subdir /home/airflow/gcs/data/test
-

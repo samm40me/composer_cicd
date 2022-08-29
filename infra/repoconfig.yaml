@@ -23,4 +23,3 @@ triggers:
     push:
       branch: ^(main|test|uat|preprod)$
       invert_regex: false
-

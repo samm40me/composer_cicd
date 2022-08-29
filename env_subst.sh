@@ -19,10 +19,3 @@ location_id=$4
 composer_env=$5
 
 set_tf_vars
-
-
-
-
-
-
-

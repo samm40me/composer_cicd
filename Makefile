@@ -67,19 +67,21 @@ set-iam:
 	for file in ${project_to_branch_map};do \
   		proj=$$(echo $$file|cut -d ":" -f1) ; \
   		echo $${proj} ; \
-  		$(suppress_output)gcloud config set project $${proj}; \
+  		gcloud config set project $${proj}; \
   		gcloud config list ; \
   		db=$$(gcloud composer environments describe $${proj} --location ${LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3); \
   		echo $${db}; \
   	done
 
+checks:
+	$(call run, pre-commit run --all-files)
 
 # Mount Users gcloud creds on the Container
 define run
 	$(continue_on_error)docker run \
 		--rm \
 		${run_options} \
-		-v $(PWD):${WORKDIR}:ro \
+		-v $(PWD):${WORKDIR} \
 		-v $(SA_KEY):/credentials/access.json:ro \
 		--env GOOGLE_APPLICATION_CREDENTIALS=/credentials/access.json \
 		${GCLOUD_MOUNT} \
