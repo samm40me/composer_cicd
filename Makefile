@@ -2,9 +2,9 @@ DEPLOYMNENT_PROJECT=kev-pinto-deploy
 LOCATION=europe-west2
 DEV_PROJECT ?= kev-pinto-sandbox
 COMPOSER_ENV ?= ${DEV_PROJECT}
-SA_KEY=/Users/pintok/.config/gcloud/kev-pinto-deploy-b1bf3f5a3949.json
+SA_KEY=~/.config/gcloud/application_default_credentials.json
 DAG_BUCKET ?= $$(gcloud composer environments describe ${COMPOSER_ENV} --location ${LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
-PROJECT_NUMBER ?= $$(gcloud projects list --filter=${PROJECT} --format="value(PROJECT_NUMBER)")
+PROJECT_NUMBER ?= $$(gcloud projects list --filter=name=${PROJECT} --format="value(PROJECT_NUMBER)")
 TFSTATE_BUCKET ?= ${DEPLOYMNENT_PROJECT}-composercicd-tfstate
 BUILD_CONTAINER ?= cicd
 BUILD_CONTAINER_TAG ?= latest
@@ -58,20 +58,11 @@ shell:
 	$(call run, /bin/bash)
 
 triggers: ## Build CICD triggers against your GitHub Repo
+	gcloud auth application-default login --no-browser
 	$(call run, bash /workspace_stg/tf_utils.sh apply infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
 
 del-triggers: ## Destroy your Build Triggers
 	$(call run, bash /workspace_stg/tf_utils.sh destroy infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
-
-set-iam:
-	for file in ${project_to_branch_map};do \
-  		proj=$$(echo $$file|cut -d ":" -f1) ; \
-  		echo $${proj} ; \
-  		gcloud config set project $${proj}; \
-  		gcloud config list ; \
-  		db=$$(gcloud composer environments describe $${proj} --location ${LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3); \
-  		echo $${db}; \
-  	done
 
 checks:
 	$(call run, pre-commit run --all-files)
