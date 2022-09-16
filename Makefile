@@ -1,6 +1,8 @@
-DEPLOYMNENT_PROJECT=kev-pinto-deploy
+FOLDER:=80567805671
+BILLING_ACCOUNT_ID?=017B39-5B5F1B-912B8C
 LOCATION=europe-west2
-DEV_PROJECT ?= kev-pinto-sandbox
+DEPLOYMNENT_PROJECT=cicd-lima-deploy-1204647704289
+DEV_PROJECT ?= cicd-lima-dev
 COMPOSER_ENV ?= ${DEV_PROJECT}
 SA_KEY=~/.config/gcloud/application_default_credentials.json
 DAG_BUCKET ?= $$(gcloud composer environments describe ${COMPOSER_ENV} --location ${LOCATION}|grep dagGcsPrefix|cut -d ":" -f2-3)
@@ -13,6 +15,7 @@ GCLOUD_MOUNT ?= -v $(GCLOUD_DIR):/root/.config/gcloud
 ARTIFACT_REGISTRY_NAME=airflow-test-container
 project_to_branch_map=$$(cat env_mapper.txt)
 WORKDIR?=/workspace_stg
+#$(call run, gcloud artifacts repositories create ${ARTIFACT_REGISTRY_NAME} --repository-format=docker --location=${LOCATION} --async)
 
 # Makefile command prefixes
 continue_on_error = -
@@ -32,19 +35,20 @@ help: ## This is help
 init: ## This will build the Airflow testing Container -- Run this once only
 	$(suppress_output)docker build -t ${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} .
 
-bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
+bootstrap: ## Creates a Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
+	$(suppress_output)gcloud projects create ${DEPLOYMNENT_PROJECT} --folder=80567805671
+	$(suppress_output)gcloud alpha billing accounts projects link ${DEPLOYMNENT_PROJECT} --account-id=${BILLING_ACCOUNT_ID}
 	$(suppress_output)gcloud config set project ${DEPLOYMNENT_PROJECT}
-	$(suppress_output)echo "Enabling Artifact Registry API...."
-	$(call run, gcloud services enable artifactregistry.googleapis.com)
 	$(suppress_output)echo "Enabling Cloud Resource Manager API...."
 	$(call run, gcloud services enable cloudresourcemanager.googleapis.com)
+	$(suppress_output)echo "Enabling Artifact Registry API...."
+	$(call run, gcloud services enable artifactregistry.googleapis.com)
+	$(suppress_output)echo "Building Artifact Repo to Store Docker Image of Airflow Test Container...."
+	$(call run, gcloud artifacts repositories create ${ARTIFACT_REGISTRY_NAME} --repository-format=docker --location=${LOCATION})
 	$(suppress_output)echo "Enabling Cloud Build API...."
 	$(call run, gcloud services enable cloudbuild.googleapis.com)
-	$(suppress_output)echo "Building Artifact Repo to Store Docker Image of Airflow Test Container...."
-	$(call run, gcloud artifacts repositories create ${ARTIFACT_REGISTRY_NAME} --repository-format=docker --location=${LOCATION} --async)
 	(suppress_output)echo "Creating Terraform State Bucket ${TFSTATE_BUCKET}...."
 	$(call run, gsutil mb -c standard -l ${LOCATION} -p ${DEPLOYMNENT_PROJECT} gs://${TFSTATE_BUCKET})
-
 
 deploy: tests ## Deploy Dags to Your Dev Project -- This Runs your Unit tests first
 	$(suppress_output)gcloud config set project ${DEV_PROJECT}
@@ -59,7 +63,7 @@ shell:
 
 triggers: ## Build CICD triggers against your GitHub Repo
 	gcloud auth application-default login --no-browser
-	$(call run, bash /workspace_stg/tf_utils.sh apply infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
+	$(call run, bash /workspace_stg/tf_utils.sh apply infra/triggers ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})
 
 del-triggers: ## Destroy your Build Triggers
 	$(call run, bash /workspace_stg/tf_utils.sh destroy infra ${DEPLOYMNENT_PROJECT} ${LOCATION} ${COMPOSER_ENV})

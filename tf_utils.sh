@@ -2,6 +2,7 @@
 set -ux
 
 WORKDIR=/tmp/workspace
+
 # Start of Bash Script
 command=$1
 folder=$2
@@ -10,9 +11,9 @@ location_id=$4
 composer_env=$5
 
 cp -R /workspace_stg ${WORKDIR}/
-source ${WORKDIR}/env_subst.sh $command ${WORKDIR}/infra $project_id $location_id $composer_env
+source ${WORKDIR}/env_subst.sh $command ${WORKDIR}/${folder} $project_id $location_id $composer_env
 
-cd ${WORKDIR}/infra
+cd ${WORKDIR}/${folder}
 
 terraform init || exit 1
 terraform workspace select ${project_id} || terraform workspace new ${project_id}

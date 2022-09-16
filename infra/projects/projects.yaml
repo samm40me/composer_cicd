@@ -1,0 +1,27 @@
+projects:
+- name: cicd-dev
+  description: Dev Project
+  tags: dev
+  apis:
+    - dataproc.googleapis.com
+    - composer.googleapis.com
+    - cloudfunctions.googleapis.com
+    - bigquery.googleapis.com
+    - storage.googleapis.com
+    - dataflow.googleapis.com
+- name: cicd-test
+  description: Dev Project
+  tags: test
+  apis:
+    - dataproc.googleapis.com
+    - composer.googleapis.com
+    - bigquery.googleapis.com
+    - storage.googleapis.com
+- name: cicd-prod
+  description: Dev Project
+  tags: prod
+  apis:
+    - dataproc.googleapis.com
+    - composer.googleapis.com
+    - bigquery.googleapis.com
+    - storage.googleapis.com
