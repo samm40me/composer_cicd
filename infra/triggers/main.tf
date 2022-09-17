@@ -1,5 +1,5 @@
 locals {
-  cloudbuild_config = yamldecode(file("./repoconfig.yaml"))
+  cloudbuild_config = yamldecode(file("../../repoconfig.yaml"))
 
   triggers = [
   for trigger in local.cloudbuild_config.triggers : {

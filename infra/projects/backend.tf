@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket  = "PROJECT_ID-composercicd-tfstate"
+    bucket  = "PROJECT_ID-PROJECT_NUMBER-tfstate"
     prefix  = "projects"
   }
 }
