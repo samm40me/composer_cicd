@@ -1,17 +1,43 @@
 locals {
-  project_config = var.projects
-  default_apis   = [
-                    "cloudresourcemanager.googleapis.com",
-                    "dataproc.googleapis.com",
-                    "composer.googleapis.com",
-                    "cloudfunctions.googleapis.com",
-                    "bigquery.googleapis.com",
-                    "storage.googleapis.com"
-                  ]
-  projects       = [
-  for project in local.project_config.projects : {
+  default_apis = [
+    "iam.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "dataproc.googleapis.com",
+    "composer.googleapis.com",
+    "cloudfunctions.googleapis.com",
+    "bigquery.googleapis.com",
+    "storage.googleapis.com"
+  ]
+
+  projects = [
+  for project in var.projects.projects : {
     name = project.name
-    apis = distinct(concat(local.default_apis, try(project.apis, [])))
   }
   ]
+
+  google_services = flatten([
+  for project in var.projects.projects : [
+  for service in distinct(concat(try(project.apis,[]),local.default_apis)) : {
+    service_name = service
+    project_name = project.name
+  }
+  ]
+  ])
+}
+
+resource "google_project" "my_project-in-a-folder" {
+  for_each        = {for project in local.projects : project.name=>project}
+  name            = each.value.name
+  project_id      = each.value.name
+  folder_id       = var.folder
+  billing_account = var.billing_account
+}
+
+
+resource "google_project_service" "project" {
+  for_each = { for service in local.google_services: "${service.project_name}.${service.service_name}"=>service}
+  project = each.value.project_name
+  service = each.value.service_name
+  disable_dependent_services = true
+  depends_on = [google_project.my_project-in-a-folder]
 }

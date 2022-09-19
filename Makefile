@@ -84,6 +84,8 @@ define run
 	$(continue_on_error)docker run \
 		--rm \
 		${run_options} \
+		--env TF_VAR_folder=${FOLDER} \
+		--env TF_VAR_billing_account=${BILLING_ACCOUNT_ID} \
 		-v $(PWD):${WORKDIR} \
 		-v $(SA_KEY):/credentials/access.json:ro \
 		--env GOOGLE_APPLICATION_CREDENTIALS=/credentials/access.json \

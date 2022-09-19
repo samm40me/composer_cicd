@@ -1,19 +1,7 @@
-locals {
-  project_config = yamldecode(file("../../projects.yaml"))
-#  default_apis   = [
-#                    "cloudresourcemanager.googleapis.com",
-#                    "dataproc.googleapis.com",
-#                    "composer.googleapis.com",
-#                    "cloudfunctions.googleapis.com",
-#                    "bigquery.googleapis.com",
-#                    "storage.googleapis.com"
-#                  ]
-#  projects       = [
-#  for project in local.project_config.projects : {
-#    name = project.name
-#    apis = distinct(concat(local.default_apis, try(project.apis, [])))
-#  }
-#  ]
+# Create the Project
+module "create_projects" {
+  source   = "../modules/projects"
+  projects = yamldecode(file("../../projects.yaml"))
+  folder   = var.folder
+  billing_account = var.billing_account
 }
-
-module
