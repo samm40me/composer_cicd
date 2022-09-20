@@ -25,14 +25,14 @@ locals {
   ])
 }
 
-resource "random_id" "random_project_id_suffix" {
-  byte_length = 3
-}
+#resource "random_id" "random_project_id_suffix" {
+#  byte_length = 3
+#}
 
 resource "google_project" "my_project-in-a-folder" {
   for_each        = {for project in local.projects : project.name=>project}
   name            = each.value.name
-  project_id      = "${each.value.name}-${random_id.random_project_id_suffix.hex}"
+  project_id      = each.value.name
   folder_id       = var.folder
   billing_account = var.billing_account
 }
@@ -45,3 +45,5 @@ resource "google_project_service" "project" {
   disable_dependent_services = true
   depends_on = [google_project.my_project-in-a-folder]
 }
+
+
