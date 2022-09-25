@@ -5,8 +5,8 @@ projects:
   apis:
     - dataflow.googleapis.com
 - name: TEST_PROJECT
-  description: Dev Project
+  description: Test Project
   tags: test
 - name: PROD_PROJECT
-  description: Dev Project
+  description: Prod Project
   tags: prod
