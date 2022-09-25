@@ -9,7 +9,6 @@ folder=$2
 project_number=$3
 
 project_id=${TF_VAR_deployment_project}
-location_id=${TF_VAR_location}
 dev_project=${TF_VAR_dev_project}
 test_project=${TF_VAR_test_project}
 prod_project=${TF_VAR_prod_project}
@@ -20,10 +19,10 @@ tf_folder=$(basename ${folder})
 echo ${tf_folder}
 
 if [ ${tf_folder} == "projects" ]; then
-  source ${WORKDIR}/proj_subst.sh ${dev_project} ${test_project} ${prod_project}
+  source ${WORKDIR}/proj_subst.sh
 fi
 
-source ${WORKDIR}/env_subst.sh $command ${WORKDIR}/${folder} $project_id $location_id $project_number
+source ${WORKDIR}/env_subst.sh $command ${WORKDIR}/${folder}
 
 cd ${WORKDIR}/${folder}
 

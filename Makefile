@@ -7,7 +7,7 @@ DAG_BUCKET?=$$(gcloud composer environments describe ${COMPOSER_ENV} --location 
 PROJECT_NUMBER?=$$(gcloud projects list --filter=name=${TF_VAR_dev_project} --format="value(PROJECT_NUMBER)")
 #DEPLOYMENT_PROJECT_NUMBER?=$$(gcloud projects list --filter=name=${TF_VAR_deployment_project} --format="value(PROJECT_NUMBER)")
 DEPLOYMENT_PROJECT_NUMBER=123456
-TFSTATE_BUCKET ?= ${TF_VAR_deployment_project}-${DEPLOYMENT_PROJECT_NUMBER}-tfstate
+TF_VAR_tfstate_bucket ?= ${TF_VAR_deployment_project}-${DEPLOYMENT_PROJECT_NUMBER}-tfstate
 BUILD_CONTAINER ?= cicd
 BUILD_CONTAINER_TAG ?= latest
 GCLOUD_DIR ?= $$(gcloud info --format='value(config.paths.global_config_dir)')
@@ -38,7 +38,7 @@ init: ## This will build the Local Dev Container
 
 bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
 	$(suppress_output)gcloud projects create ${DEPLOYMNENT_PROJECT} --folder=${FOLDER}
-	$(suppress_output)gcloud alpha billing accounts projects link ${DEPLOYMNENT_PROJECT} --account-id=${BILLING_ACCOUNT_ID}
+	$(suppress_output)gcloud beta billing accounts projects link ${DEPLOYMNENT_PROJECT} --account-id=${BILLING_ACCOUNT_ID}
 	$(suppress_output)gcloud config set project ${DEPLOYMNENT_PROJECT}
 	$(suppress_output)echo "Enabling Cloud Resource Manager API...."
 	$(call run, gcloud services enable cloudresourcemanager.googleapis.com)
@@ -46,8 +46,8 @@ bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! 
 	$(call run, gcloud services enable artifactregistry.googleapis.com)
 	$(suppress_output)echo "Enabling Cloud Build API...."
 	$(call run, gcloud services enable cloudbuild.googleapis.com)
-	$(suppress_output)echo "Creating Terraform State Bucket ${TFSTATE_BUCKET}...."
-	$(call run, gsutil mb -c standard -l ${TF_VAR_location} -p ${DEPLOYMNENT_PROJECT} gs://${TFSTATE_BUCKET})
+	$(suppress_output)echo "Creating Terraform State Bucket ${TF_VAR_tfstate_bucket}...."
+	$(call run, gsutil mb -c standard -l ${TF_VAR_location} -p ${DEPLOYMNENT_PROJECT} gs://${TF_VAR_tfstate_bucket})
 
 repo:init ## Setup Artifact Registry Docker Repo in the Deployment Project
 	$(suppress_output)gcloud config set project ${DEPLOYMNENT_PROJECT}
@@ -95,6 +95,8 @@ define run
 		-v $(PWD):${WORKDIR} \
 		-v $(SA_KEY):/credentials/access.json:ro \
 		--env GOOGLE_APPLICATION_CREDENTIALS=/credentials/access.json \
+		-e TF_VAR_tfstate_bucket=${TF_VAR_tfstate_bucket} \
+		-e TF_VAR_deployment_project_number=${DEPLOYMENT_PROJECT_NUMBER} \
 		--env-file env.config \
 		${GCLOUD_MOUNT} \
 		-w ${WORKDIR} \

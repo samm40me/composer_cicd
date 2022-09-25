@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket  = "PROJECT_ID-PROJECT_NUMBER-tfstate"
+    bucket  = "TFSTATE_BUCKET"
     prefix  = "triggers"
   }
 }
