@@ -6,7 +6,15 @@ locals {
     "composer.googleapis.com",
     "cloudfunctions.googleapis.com",
     "bigquery.googleapis.com",
-    "storage.googleapis.com"
+    "storage.googleapis.com",
+    "compute.googleapis.com",
+    "iamcredentials.googleapis.com",
+    "monitoring.googleapis.com",
+    "logging.googleapis.com",
+    "notebooks.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "aiplatform.googleapis.com",
+    "container.googleapis.com"
   ]
 
   projects = [

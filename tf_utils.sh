@@ -27,13 +27,13 @@ source ${WORKDIR}/env_subst.sh $command ${WORKDIR}/${folder}
 cd ${WORKDIR}/${folder}
 
 gcloud config set project ${project_id}
-#terraform init || exit 1
-#terraform workspace select ${project_id} || terraform workspace new ${project_id}
-#
-#if [ $command == "apply" ]; then
-#  terraform apply --auto-approve
-#elif [ $command == "destroy" ]; then
-#  terraform destroy --auto-approve
-#elif [ $command == "plan" ]; then
-#  terraform plan
-#fi
+terraform init || exit 1
+terraform workspace select ${project_id} || terraform workspace new ${project_id}
+
+if [ $command == "apply" ]; then
+  terraform apply --auto-approve
+elif [ $command == "destroy" ]; then
+  terraform destroy --auto-approve
+elif [ $command == "plan" ]; then
+  terraform plan
+fi
