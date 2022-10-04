@@ -55,7 +55,8 @@ repo:init ## Setup Artifact Registry Docker Repo in the Deployment Project
 	$(suppress_output)echo "Building Artifact Repo to Store Docker Image of Airflow Test Container...."
 	$(suppress_output)gcloud artifacts repositories create ${ARTIFACT_REGISTRY_NAME} --repository-format=docker --location=${TF_VAR_location}
 
-projects: ## Builds the Dev, Test and Prod Projects and Enable APIs
+projects:auth ## Builds the Dev, Test and Prod Projects and Enable APIs
+
 	$(call run, bash /workspace_stg/tf_utils.sh \
 	plan \
 	infra/projects \
@@ -84,6 +85,9 @@ del-triggers: ## Destroy your Build Triggers
 	destroy \
 	infra/triggers \
 	${DEPLOYMENT_PROJECT_NUMBER})
+
+auth:
+	gcloud auth application-default login
 
 checks:
 	$(call run, pre-commit run --all-files)

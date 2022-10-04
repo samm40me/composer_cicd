@@ -54,9 +54,10 @@ resource "google_project_service" "project" {
   depends_on = [google_project.my_project-in-a-folder]
 }
 
-#resource "google_project_iam_member" "project" {
-#for_each        = {for project in local.projects : project.name=>project}
-#  project = each.value.name
-#  role    = "roles/editor"
-#  member  = "serviceAccount:jane@example.com"
-#}
+resource "google_project_iam_member" "project" {
+for_each        = {for project in local.projects : project.name=>project}
+  project = each.value.name
+  role    = "roles/editor"
+  member  = "serviceAccount:133446737954@cloudbuild.gserviceaccount.com"
+  depends_on = [google_project_service.project]
+}
