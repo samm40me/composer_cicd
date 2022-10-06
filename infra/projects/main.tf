@@ -8,4 +8,5 @@ module "create_projects" {
   folder   = var.folder
   billing_account = var.billing_account
   project_number = data.google_project.project.number
+  location = var.location
 }

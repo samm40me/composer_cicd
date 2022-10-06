@@ -6,7 +6,6 @@ SA_KEY=~/.config/gcloud/application_default_credentials.json
 DAG_BUCKET?=$$(gcloud composer environments describe ${COMPOSER_ENV} --location ${TF_VAR_location}|grep dagGcsPrefix|cut -d ":" -f2-3)
 PROJECT_NUMBER?=$$(gcloud projects list --filter=name=${TF_VAR_dev_project} --format="value(PROJECT_NUMBER)")
 DEPLOYMENT_PROJECT_NUMBER?=$$(gcloud projects list --filter=name=${TF_VAR_deployment_project} --format="value(PROJECT_NUMBER)")
-#DEPLOYMENT_PROJECT_NUMBER=123456
 TF_VAR_tfstate_bucket ?= ${TF_VAR_deployment_project}-${DEPLOYMENT_PROJECT_NUMBER}-tfstate
 BUILD_CONTAINER ?= cicd
 BUILD_CONTAINER_TAG ?= latest
@@ -34,6 +33,7 @@ test:
 	@echo ${COMPOSER_ENV}
 
 init: ## This will build the Local Dev Container
+	#$(suppress_output)gcloud components update
 	$(suppress_output)docker build -t ${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} .
 
 bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
@@ -47,18 +47,19 @@ bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! 
 	$(call run, gcloud services enable artifactregistry.googleapis.com)
 	$(suppress_output)echo "Enabling Cloud Build API...."
 	$(call run, gcloud services enable cloudbuild.googleapis.com)
+	$(suppress_output)echo "Enabling Cloud Billing API...."
+	$(call run, gcloud services enable cloudbilling.googleapis.com)
 	$(suppress_output)echo "Creating Terraform State Bucket ${TF_VAR_tfstate_bucket}...."
-	$(call run, gsutil mb -c standard -l ${TF_VAR_location} -p ${TF_VAR_deployment_project} gs://${TF_VAR_tfstate_bucket})
+	#$(call run, gsutil mb -c standard -l ${TF_VAR_location} -p ${TF_VAR_deployment_project} gs://${TF_VAR_tfstate_bucket})
 
-repo:init ## Setup Artifact Registry Docker Repo in the Deployment Project
+repo:init auth ## Setup Artifact Registry Docker Repo in the Deployment Project
 	$(suppress_output)gcloud config set project ${TF_VAR_deployment_project}
 	$(suppress_output)echo "Building Artifact Repo to Store Docker Image of Airflow Test Container...."
 	$(suppress_output)gcloud artifacts repositories create ${ARTIFACT_REGISTRY_NAME} --repository-format=docker --location=${TF_VAR_location}
 
-projects:auth ## Builds the Dev, Test and Prod Projects and Enable APIs
-
+projects: ## Builds the Dev, Test and Prod Projects and Enable APIs
 	$(call run, bash /workspace_stg/tf_utils.sh \
-	plan \
+	apply \
 	infra/projects \
  	${DEPLOYMENT_PROJECT_NUMBER})
 
