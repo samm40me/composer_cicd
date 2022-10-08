@@ -86,15 +86,25 @@ resource "google_composer_environment" "composer2" {
       }
     }
   }
+}
+
+resource "null_resource" "del_env_mappers" {
+  triggers = {
+    always_run = timestamp()
+  }
+
   provisioner "local-exec" {
-    command = "echo ${self.config.0.dag_gcs_prefix} >> /config/dag_buckets.txt"
+    command = "rm -f /config/env_mapper.txt"
   }
 }
 
-
-#resource "null_resource" "get_composer_bucket_names" {
-#  provisioner "local-exec" {
-#    command = "Get-Date > completed.txt"
-#    interpreter = ["PowerShell", "-Command"]
-#  }
-#}
+resource "null_resource" "create_env_mappers" {
+for_each = {for project in local.projects : project.name=>project}
+  triggers = {
+    always_run = timestamp()
+  }
+  provisioner "local-exec" {
+    command = "echo ${each.value.name}:${google_composer_environment.composer2[each.key].config.0.dag_gcs_prefix} >> /config/env_mapper.txt"
+  }
+  depends_on = [null_resource.del_env_mappers]
+}
