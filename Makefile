@@ -1,5 +1,5 @@
 # Include config File Vars
-include env.config
+include config/env.config
 
 COMPOSER_ENV?=${TF_VAR_dev_project}
 SA_KEY=~/.config/gcloud/application_default_credentials.json
@@ -99,11 +99,12 @@ define run
 		--rm \
 		${run_options} \
 		-v $(PWD):${WORKDIR} \
+		-v $(PWD)/config:/config:rw \
 		-v $(SA_KEY):/credentials/access.json:ro \
 		--env GOOGLE_APPLICATION_CREDENTIALS=/credentials/access.json \
 		-e TF_VAR_tfstate_bucket=${TF_VAR_tfstate_bucket} \
 		-e TF_VAR_deployment_project_number=${DEPLOYMENT_PROJECT_NUMBER} \
-		--env-file env.config \
+		--env-file ./config/env.config \
 		${GCLOUD_MOUNT} \
 		-w ${WORKDIR} \
 		${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} \

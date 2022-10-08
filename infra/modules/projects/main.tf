@@ -86,4 +86,15 @@ resource "google_composer_environment" "composer2" {
       }
     }
   }
+  provisioner "local-exec" {
+    command = "echo ${self.config.0.dag_gcs_prefix} >> /config/dag_buckets.txt"
+  }
 }
+
+
+#resource "null_resource" "get_composer_bucket_names" {
+#  provisioner "local-exec" {
+#    command = "Get-Date > completed.txt"
+#    interpreter = ["PowerShell", "-Command"]
+#  }
+#}
