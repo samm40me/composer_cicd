@@ -3,7 +3,7 @@ triggers:
   description: trigger to verify dag integity on a PR
   tags: demo
   disabled: false
-  filename: pre-merge.yaml
+  filename: cloudbuild/pre-merge.yaml
   include_build_logs: INCLUDE_BUILD_LOGS_WITH_STATUS
   github:
     owner: kev-pinto-cts
@@ -16,7 +16,7 @@ triggers:
   description: Trigger to Deploy Dags
   tags: demo
   disabled: false
-  filename: pre-merge.yaml
+  filename: cloudbuild/pre-merge.yaml
   github:
     owner: kev-pinto-cts
     name: composer_cicd

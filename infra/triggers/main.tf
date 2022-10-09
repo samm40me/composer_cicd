@@ -1,5 +1,5 @@
 locals {
-  cloudbuild_config = yamldecode(file("../../repoconfig.yaml"))
+  cloudbuild_config = yamldecode(file("../../config/repoconfig.yaml"))
 
   triggers = [
   for trigger in local.cloudbuild_config.triggers : {
@@ -19,10 +19,6 @@ locals {
 }
 
 data "google_project" "project" {}
-
-#output "trigger" {
-#  value = local.triggers
-#}
 
 resource "google_cloudbuild_trigger" "build_trigger" {
   for_each           = {for trg in local.triggers : trg.name=>trg}

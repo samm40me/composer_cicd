@@ -1,2 +1,0 @@
-variable "triggers" {}
-variable "region" {}

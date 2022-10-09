@@ -19,10 +19,10 @@ tf_folder=$(basename ${folder})
 echo ${tf_folder}
 
 if [ ${tf_folder} == "projects" ]; then
-  source ${WORKDIR}/proj_subst.sh
+  source ${WORKDIR}/infra/proj_subst.sh
 fi
 
-source ${WORKDIR}/env_subst.sh $command ${WORKDIR}/${folder}
+source ${WORKDIR}/infra/env_subst.sh $command ${WORKDIR}/${folder}
 
 cd ${WORKDIR}/${folder}
 

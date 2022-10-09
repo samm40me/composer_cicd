@@ -33,8 +33,8 @@ test:
 	@echo ${COMPOSER_ENV}
 
 init: ## This will build the Local Dev Container
-	#$(suppress_output)gcloud components update
-	$(suppress_output)docker build -t ${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} .
+	$(suppress_output)gcloud components update
+	$(suppress_output)docker build . -t ${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} -f devcontainer/Dockerfile
 
 bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
 	$(suppress_output)echo "Creating Deployment Project ${TF_VAR_deployment_project}"
@@ -58,10 +58,16 @@ repo:init auth ## Setup Artifact Registry Docker Repo in the Deployment Project
 	$(suppress_output)gcloud artifacts repositories create ${ARTIFACT_REGISTRY_NAME} --repository-format=docker --location=${TF_VAR_location}
 
 projects: ## Builds the Dev, Test and Prod Projects and Enable APIs
-	$(call run, bash /workspace_stg/tf_utils.sh \
+	$(call run, bash /workspace_stg/infra/tf_utils.sh \
 	apply \
 	infra/projects \
  	${DEPLOYMENT_PROJECT_NUMBER})
+
+triggers: ## Build CICD triggers against your GitHub Repo
+	$(call run, bash /workspace_stg/infra/tf_utils.sh \
+	apply \
+	infra/triggers \
+	${DEPLOYMENT_PROJECT_NUMBER})
 
 deploy:tests ## Deploy Dags to Your Dev Project -- This Runs your Unit tests first
 	$(suppress_output)gcloud config set project ${TF_VAR_dev_project}
@@ -74,15 +80,9 @@ tests: ## Run your Airflow Unit Tests -- Make sure you run `make init` at least 
 shell:
 	$(call run, /bin/bash)
 
-triggers: ## Build CICD triggers against your GitHub Repo
-	gcloud auth application-default login --no-browser
-	$(call run, bash /workspace_stg/tf_utils.sh \
-	apply \
-	infra/triggers \
-	${DEPLOYMENT_PROJECT_NUMBER})
 
 del-triggers: ## Destroy your Build Triggers
-	$(call run, bash /workspace_stg/tf_utils.sh \
+	$(call run, bash /workspace_stg/infra/tf_utils.sh \
 	destroy \
 	infra/triggers \
 	${DEPLOYMENT_PROJECT_NUMBER})
