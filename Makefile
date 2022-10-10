@@ -34,7 +34,7 @@ test:
 
 init: ## This will build the Local Dev Container
 	$(suppress_output)gcloud components update
-	$(suppress_output)docker build . -t ${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} -f devcontainer/Dockerfile
+	$(suppress_output)docker build . -t ${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} -f cloudbuild/Dockerfile
 
 bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
 	$(suppress_output)echo "Creating Deployment Project ${TF_VAR_deployment_project}"
@@ -64,8 +64,18 @@ projects: ## Builds the Dev, Test and Prod Projects and Enable APIs
  	${DEPLOYMENT_PROJECT_NUMBER})
 
 triggers: ## Build CICD triggers against your GitHub Repo
+	$(suppress_output)sed -i '' "s/TF_VAR_location/${TF_VAR_location}/g" $(PWD)/cloudbuild/pre-merge.yaml
+	$(suppress_output)sed -i '' "s/TF_VAR_location/${TF_VAR_location}/g" $(PWD)/cloudbuild/on-merge.yaml
 	$(call run, bash /workspace_stg/infra/tf_utils.sh \
 	apply \
+	infra/triggers \
+	${DEPLOYMENT_PROJECT_NUMBER})
+
+del-triggers: ## Destroy your Build Triggers
+	$(suppress_output)sed -i '' "s/TF_VAR_location/${TF_VAR_location}/g" $(PWD)/cloudbuild/pre-merge.yaml
+	$(suppress_output)sed -i '' "s/TF_VAR_location/${TF_VAR_location}/g" $(PWD)/cloudbuild/on-merge.yaml
+	$(call run, bash /workspace_stg/infra/tf_utils.sh \
+	destroy \
 	infra/triggers \
 	${DEPLOYMENT_PROJECT_NUMBER})
 
@@ -79,13 +89,6 @@ tests: ## Run your Airflow Unit Tests -- Make sure you run `make init` at least 
 
 shell:
 	$(call run, /bin/bash)
-
-
-del-triggers: ## Destroy your Build Triggers
-	$(call run, bash /workspace_stg/infra/tf_utils.sh \
-	destroy \
-	infra/triggers \
-	${DEPLOYMENT_PROJECT_NUMBER})
 
 auth:
 	gcloud auth application-default login

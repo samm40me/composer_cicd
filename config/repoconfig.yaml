@@ -1,6 +1,6 @@
 triggers:
 - name: composer-cicd-pre-merge
-  description: trigger to verify dag integity on a PR
+  description: Trigger to verify dag integity on a PR
   tags: demo
   disabled: false
   filename: cloudbuild/pre-merge.yaml
@@ -16,7 +16,7 @@ triggers:
   description: Trigger to Deploy Dags
   tags: demo
   disabled: false
-  filename: cloudbuild/pre-merge.yaml
+  filename: cloudbuild/on-merge.yaml
   github:
     owner: kev-pinto-cts
     name: composer_cicd

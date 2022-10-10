@@ -1,0 +1,16 @@
+steps:
+- id: 'branch-name'
+  name: 'alpine'
+  waitFor: [ '-' ]
+  entrypoint: 'sh'
+  args:
+    - '-c'
+    - |
+      echo  echo "*****************************DAG CICD - BRANCH:$BRANCH_NAME*******************************************************"
+      echo "HEAD BRANCH_NAME: $_HEAD_BRANCH -- BASE BRANCH_NAME:$_BASE_BRANCH -- SHORT_SHA - ${SHORT_SHA} PROJECT_ID: $PROJECT_ID"
+      echo "***********************************************************************************************************************"
+options:
+  dynamic_substitutions: true
+substitutions:
+  _COMPOSER_LOCATION: europe-west2
+  _COMPOSER_ENV: ${PROJECT_ID}
