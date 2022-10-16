@@ -57,5 +57,5 @@ steps:
 options:
   dynamic_substitutions: true
 substitutions:
-  _COMPOSER_LOCATION: europe-west2
+  _COMPOSER_LOCATION: TF_VAR_location
   _COMPOSER_ENV: ${PROJECT_ID}
