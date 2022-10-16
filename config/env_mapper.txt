@@ -1,2 +1,2 @@
-cicd-arequipa-test:gs://europe-west2-cicd-arequipa--07de67c8-bucket/dags:test
-cicd-arequipa-prod:gs://europe-west2-cicd-arequipa--29e6ee85-bucket/dags:main
+cicd-arequipa-test~gs://europe-west2-cicd-arequipa--07de67c8-bucket/dags~test
+cicd-arequipa-prod~gs://europe-west2-cicd-arequipa--29e6ee85-bucket/dags~main

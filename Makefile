@@ -36,7 +36,7 @@ init: ## This will build the Local Dev Container
 	$(suppress_output)gcloud components update
 	$(suppress_output)docker build . -t ${BUILD_CONTAINER}:${BUILD_CONTAINER_TAG} -f cloudbuild/Dockerfile
 
-bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
+bootstrap: auth## Creates a Deployment Project and Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
 	$(suppress_output)echo "Creating Deployment Project ${TF_VAR_deployment_project}"
 	#$(suppress_output)gcloud projects create ${TF_VAR_deployment_project} --folder=${TF_VAR_folder}
 	$(suppress_output)gcloud beta billing projects link ${TF_VAR_deployment_project} --billing-account=${TF_VAR_billing_account}
@@ -49,19 +49,27 @@ bootstrap:init ## Creates a Bucket to Store Terraform State -- Do this FIRST !! 
 	$(call run, gcloud services enable cloudbuild.googleapis.com)
 	$(suppress_output)echo "Enabling Cloud Billing API...."
 	$(call run, gcloud services enable cloudbilling.googleapis.com)
+	$(call run, gcloud services enable container.googleapis.com)
 	$(suppress_output)echo "Creating Terraform State Bucket ${TF_VAR_tfstate_bucket}...."
 	#$(call run, gsutil mb -c standard -l ${TF_VAR_location} -p ${TF_VAR_deployment_project} gs://${TF_VAR_tfstate_bucket})
 
-repo:init auth ## Setup Artifact Registry Docker Repo in the Deployment Project
+repo: ## Setup Artifact Registry Docker Repo in the Deployment Project, Do this after bootstrap
 	$(suppress_output)gcloud config set project ${TF_VAR_deployment_project}
 	$(suppress_output)echo "Building Artifact Repo to Store Docker Image of Airflow Test Container...."
 	$(suppress_output)gcloud artifacts repositories create ${ARTIFACT_REGISTRY_NAME} --repository-format=docker --location=${TF_VAR_location}
 
-projects: ## Builds the Dev, Test and Prod Projects and Enable APIs
+projects: ## Builds the Dev, Test and Prod Projects - Enable APIs and Setup Composer, Run this after make repo
 	$(call run, bash /workspace_stg/infra/tf_utils.sh \
 	apply \
 	infra/projects \
  	${DEPLOYMENT_PROJECT_NUMBER})
+
+del-projects: ## Drops the Dev, Test and Prod Projects
+	$(call run, bash /workspace_stg/infra/tf_utils.sh \
+	destroy \
+	infra/projects \
+ 	${DEPLOYMENT_PROJECT_NUMBER})
+ 	$(call run, gcloud projects delete ${PROJECT_NUMBER})
 
 triggers: ## Build CICD triggers against your GitHub Repo
 	$(suppress_output)sed -i '' "s/TF_VAR_location/${TF_VAR_location}/g" $(PWD)/cloudbuild/pre-merge.yaml
@@ -79,13 +87,19 @@ del-triggers: ## Destroy your Build Triggers
 	infra/triggers \
 	${DEPLOYMENT_PROJECT_NUMBER})
 
-deploy:tests ## Deploy Dags to Your Dev Project -- This Runs your Unit tests first
+deploy: ## Deploy Dags to Your Dev Project -- This Runs your Unit tests first
 	$(suppress_output)gcloud config set project ${TF_VAR_dev_project}
 	$(suppress_output)echo ${DAG_BUCKET}
-	$(call run,gsutil -m rsync -r dags/  ${DAG_BUCKET})
+	$(call run, \
+	  pytest ${WORKDIR}/tests \
+	  && gsutil -m rsync -r dags/  ${DAG_BUCKET} \
+	  && gsutil rm -rf ${WORKDIR}/dags/__pycache__ \
+	  && gsutil rm -f ${WORKDIR}/dags/.DS_Store \
+	  && gsutil rm -f ${WORKDIR}/dags/*.pyc \
+  )
 
 tests: ## Run your Airflow Unit Tests -- Make sure you run `make init` at least once before running this
-	$(call run, pytest /workspace/tests)
+	$(call run, pytest ${WORKDIR}/tests)
 
 shell:
 	$(call run, /bin/bash)

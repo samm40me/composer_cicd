@@ -14,17 +14,28 @@ steps:
   name: 'gcr.io/kaniko-project/executor:latest'
   waitFor: [ '-' ]
   args:
+    - --dockerfile=./cloudbuild/Dockerfile
     - --destination=${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd
     - --cache=true
     - --cache-ttl=240h
 
-- id: 'pre-commit'
+- id: 'lint'
   name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd:latest'
   waitFor: [ 'build-test-container' ]
+  entrypoint: 'sh'
   args:
-    - pre-commit
-    - run
-    - --all-files
+    - '-c'
+    - |
+      flake8
+
+- id: 'pre-commit-checks'
+  name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd:latest'
+  waitFor: [ 'build-test-container' ]
+  entrypoint: 'sh'
+  args:
+    - '-c'
+    - |
+      pre-commit run --all-files
 
 - id: 'run-unit-test'
   name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd:latest'
@@ -37,13 +48,12 @@ steps:
 
 - id: 'run-int-test'
   name: '${_COMPOSER_LOCATION}-docker.pkg.dev/${PROJECT_ID}/airflow-test-container/cicd:latest'
-  waitFor: [ 'build-test-container' ]
-  entrypoint: 'bash'
+  waitFor: [ 'build-test-container','run-unit-test' ]
+  entrypoint: 'sh'
   args:
-    - run_integration_tests.sh
-    - $BRANCH_NAME
-    - $SHORT_SHA
-    - $_COMPOSER_LOCATION
+  - '-c'
+  - |
+    chmod 411 cloudbuild/run_integration_tests.sh && ./cloudbuild/run_integration_tests.sh $_BASE_BRANCH $SHORT_SHA $_COMPOSER_LOCATION || exit 1
 options:
   dynamic_substitutions: true
 substitutions:

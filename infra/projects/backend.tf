@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket  = "TFSTATE_BUCKET"
-    prefix  = "projects"
+    bucket = "TFSTATE_BUCKET"
+    prefix = "projects"
   }
 }

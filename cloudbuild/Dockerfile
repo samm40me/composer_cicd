@@ -1,7 +1,7 @@
 FROM eu.gcr.io/cts-public-images-1/cts-standard
 
 
-ARG AIRFLOW_VERSION=2.2.5
+ARG AIRFLOW_VERSION=2.3.3
 ARG PYTHON_VERSION=3.9
 ARG CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
 RUN pip install "apache-airflow[async,postgresql,google]==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"

@@ -1,11 +1,17 @@
 [flake8]
 ignore = E241, E712, W504
+max-line-length = 160
 exclude =
     setup.py,
     # No need to traverse our git directory
     .git,
     # There's no value in checking cache directories
     __pycache__,
+    .gcloudignore,
+    .gitignore,
+    .pre-commit-config.yaml,
+    infra,
+    config
 #max-complexity = 10
 per-file-ignores =
     # E202, E203 is whitespace before/after (), which is sometimes
