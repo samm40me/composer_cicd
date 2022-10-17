@@ -38,7 +38,7 @@ init: ## This will build the Local Dev Container
 
 bootstrap: auth## Creates a Deployment Project and Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
 	$(suppress_output)echo "Creating Deployment Project ${TF_VAR_deployment_project}"
-	#$(suppress_output)gcloud projects create ${TF_VAR_deployment_project} --folder=${TF_VAR_folder}
+	$(suppress_output)gcloud projects create ${TF_VAR_deployment_project} --folder=${TF_VAR_folder}
 	$(suppress_output)gcloud beta billing projects link ${TF_VAR_deployment_project} --billing-account=${TF_VAR_billing_account}
 	$(suppress_output)gcloud config set project ${TF_VAR_deployment_project}
 	$(suppress_output)echo "Enabling Cloud Resource Manager API...."
@@ -51,7 +51,7 @@ bootstrap: auth## Creates a Deployment Project and Bucket to Store Terraform Sta
 	$(call run, gcloud services enable cloudbilling.googleapis.com)
 	$(call run, gcloud services enable container.googleapis.com)
 	$(suppress_output)echo "Creating Terraform State Bucket ${TF_VAR_tfstate_bucket}...."
-	#$(call run, gsutil mb -c standard -l ${TF_VAR_location} -p ${TF_VAR_deployment_project} gs://${TF_VAR_tfstate_bucket})
+	$(call run, gsutil mb -c standard -l ${TF_VAR_location} -p ${TF_VAR_deployment_project} gs://${TF_VAR_tfstate_bucket})
 
 repo: ## Setup Artifact Registry Docker Repo in the Deployment Project, Do this after bootstrap
 	$(suppress_output)gcloud config set project ${TF_VAR_deployment_project}
@@ -64,15 +64,15 @@ projects: ## Builds the Dev, Test and Prod Projects - Enable APIs and Setup Comp
 	infra/projects \
  	${DEPLOYMENT_PROJECT_NUMBER})
 
-composer:
+composer: ## Sets up Composer 2 in your Projects
 	$(call run, bash /workspace_stg/infra/tf_utils.sh \
 	apply \
 	infra/composer \
  	${DEPLOYMENT_PROJECT_NUMBER})
 
-del-composer:
+del-composer: ## Removes Composer 2 from your Projects
 	$(call run, bash /workspace_stg/infra/tf_utils.sh \
-	apply \
+	destroy \
 	infra/composer \
  	${DEPLOYMENT_PROJECT_NUMBER})
 
@@ -92,12 +92,12 @@ del-triggers: ## Destroy your Build Triggers
 	infra/triggers \
 	${DEPLOYMENT_PROJECT_NUMBER})
 
-cleanup: del-composer del-triggers ## Drops the Bootstrap, Dev, Test and Prod Projects along with composer
+cleanup: del-composer ## NUCLEAR OPTION!! ---Drops the Bootstrap, Dev, Test and Prod Projects along with composer
 	$(call run, bash /workspace_stg/infra/tf_utils.sh \
 	destroy \
 	infra/projects \
  	${DEPLOYMENT_PROJECT_NUMBER})
- 	$(call run, gcloud projects delete ${PROJECT_NUMBER})
+ 	$(call run, gcloud projects delete ${DEPLOYMENT_PROJECT_NUMBER})
 
 deploy: ## Deploy Dags to Your Dev Project -- This Runs your Unit tests first
 	$(suppress_output)gcloud config set project ${TF_VAR_dev_project}
@@ -113,13 +113,13 @@ deploy: ## Deploy Dags to Your Dev Project -- This Runs your Unit tests first
 tests: ## Run your Airflow Unit Tests -- Make sure you run `make init` at least once before running this
 	$(call run, pytest ${WORKDIR}/tests)
 
-shell:
+shell: ##Gives Shell access to the container
 	$(call run, /bin/bash)
 
-auth:
+auth: ##Google auth
 	gcloud auth application-default login
 
-checks:
+checks: ## run pre-commit checks
 	$(call run, pre-commit run --all-files)
 
 

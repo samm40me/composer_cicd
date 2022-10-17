@@ -21,7 +21,10 @@
 - This Repo will contain our Test Airflow container that will Validate our DAGs
 
 ####Step 4 --> Run `make projects`
-- This will setup the dev,test, prod projects and install composer in them
+- This will setup the dev,test, prod projects
+
+####Step 4.1 --> Run `make composer`
+- This will install composer in the dev,test, prod projects
 
 ####Step 5 --> Run `make triggers`
 - this will setup our CICD Triggers -- Make sure to connect Cloud Build to your Repo first
@@ -33,12 +36,14 @@ init                           This will build the Local Dev Container
 bootstrap                      Creates a Deployment Project and Bucket to Store Terraform State -- Do this FIRST !! -- Also, Run this once only
 repo                           Setup Artifact Registry Docker Repo in the Deployment Project, Do this after bootstrap
 projects                       Builds the Dev, Test and Prod Projects - Enable APIs and Setup Composer, Run this after make repo
-del-projects                   Drops the Dev, Test and Prod Projects
+composer                       Sets up Composer 2 in your Projects
+del-composer                   Removes Composer 2 from your Projects
 triggers                       Build CICD triggers against your GitHub Repo
 del-triggers                   Destroy your Build Triggers
+cleanup                        Drops the Bootstrap, Dev, Test and Prod Projects along with composer
 deploy                         Deploy Dags to Your Dev Project -- This Runs your Unit tests first
 tests                          Run your Airflow Unit Tests -- Make sure you run `make init` at least once before running this
-
+checks                         run pre-commit checks
 ```
 
 ## Additional Reading
@@ -46,4 +51,3 @@ https://github.com/GoogleCloudPlatform/python-docs-samples/tree/main/composer/ci
 https://cloud.google.com/composer/docs/dag-cicd-integration-guide
 https://cloud.google.com/composer/docs/how-to/using/testing-dags
 https://cloud.google.com/architecture/cicd-pipeline-for-data-processing
-

@@ -8,7 +8,6 @@ locals {
     "cloudbilling.googleapis.com",
     "bigquery.googleapis.com",
     "storage.googleapis.com",
-    "compute.googleapis.com",
     "iamcredentials.googleapis.com",
     "monitoring.googleapis.com",
     "logging.googleapis.com",

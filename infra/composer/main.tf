@@ -4,4 +4,3 @@ module "create_projects" {
   projects        = yamldecode(file("../../config/projects.yaml"))
   location        = var.location
 }
-
