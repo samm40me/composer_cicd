@@ -22,6 +22,10 @@ if [ ${tf_folder} == "projects" ]; then
   source ${WORKDIR}/infra/proj_subst.sh
 fi
 
+if [ ${tf_folder} == "composer" ]; then
+  source ${WORKDIR}/infra/proj_subst.sh
+fi
+
 source ${WORKDIR}/infra/env_subst.sh $command ${WORKDIR}/${folder}
 
 cd ${WORKDIR}/${folder}

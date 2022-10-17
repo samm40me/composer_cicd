@@ -64,12 +64,17 @@ projects: ## Builds the Dev, Test and Prod Projects - Enable APIs and Setup Comp
 	infra/projects \
  	${DEPLOYMENT_PROJECT_NUMBER})
 
-del-projects: ## Drops the Dev, Test and Prod Projects
+composer:
 	$(call run, bash /workspace_stg/infra/tf_utils.sh \
-	destroy \
-	infra/projects \
+	apply \
+	infra/composer \
  	${DEPLOYMENT_PROJECT_NUMBER})
- 	$(call run, gcloud projects delete ${PROJECT_NUMBER})
+
+del-composer:
+	$(call run, bash /workspace_stg/infra/tf_utils.sh \
+	apply \
+	infra/composer \
+ 	${DEPLOYMENT_PROJECT_NUMBER})
 
 triggers: ## Build CICD triggers against your GitHub Repo
 	$(suppress_output)sed -i '' "s/TF_VAR_location/${TF_VAR_location}/g" $(PWD)/cloudbuild/pre-merge.yaml
@@ -86,6 +91,13 @@ del-triggers: ## Destroy your Build Triggers
 	destroy \
 	infra/triggers \
 	${DEPLOYMENT_PROJECT_NUMBER})
+
+cleanup: del-composer del-triggers ## Drops the Bootstrap, Dev, Test and Prod Projects along with composer
+	$(call run, bash /workspace_stg/infra/tf_utils.sh \
+	destroy \
+	infra/projects \
+ 	${DEPLOYMENT_PROJECT_NUMBER})
+ 	$(call run, gcloud projects delete ${PROJECT_NUMBER})
 
 deploy: ## Deploy Dags to Your Dev Project -- This Runs your Unit tests first
 	$(suppress_output)gcloud config set project ${TF_VAR_dev_project}
@@ -109,6 +121,7 @@ auth:
 
 checks:
 	$(call run, pre-commit run --all-files)
+
 
 # Mount Users gcloud creds on the Container
 define run
