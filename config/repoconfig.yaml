@@ -6,7 +6,7 @@ triggers:
   filename: cloudbuild/pre-merge.yaml
   include_build_logs: INCLUDE_BUILD_LOGS_WITH_STATUS
   github:
-    owner: kev-pinto-cts
+    owner: samm40me
     name: composer_cicd
     pull_request:
       branch: ^(main|test|uat|preprod)$
@@ -18,7 +18,7 @@ triggers:
   disabled: false
   filename: cloudbuild/on-merge.yaml
   github:
-    owner: kev-pinto-cts
+    owner: samm40me
     name: composer_cicd
     push:
       branch: ^(main|test|uat|preprod)$
